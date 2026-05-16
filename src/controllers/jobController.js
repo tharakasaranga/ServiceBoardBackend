@@ -40,7 +40,29 @@ const getSingleJob = async (req, res, next) => {
 
 const createJob = async (req, res, next) => {
   try {
-    const job = await JobRequest.create(req.body);
+    const {
+      title,
+      description,
+      category,
+      location,
+      contactName,
+      contactEmail,
+    } = req.body;
+
+    if (!title || !description) {
+      return res.status(400).json({
+        message: "Title and description are required",
+      });
+    }
+
+    const job = await JobRequest.create({
+      title,
+      description,
+      category,
+      location,
+      contactName,
+      contactEmail,
+    });
 
     res.status(201).json(job);
   } catch (error) {

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 let cachedConnection = null;
+let cachedPromise = null;
 
 const connectDB = async () => {
   try {
@@ -8,15 +9,24 @@ const connectDB = async () => {
       return cachedConnection;
     }
 
-    await mongoose.connect(process.env.MONGO_URI);
+    if (cachedPromise) {
+      return cachedPromise;
+    }
+
+    cachedPromise = mongoose.connect(process.env.MONGO_URI);
+
+    await cachedPromise;
 
     console.log("MongoDB Connected");
 
     cachedConnection = mongoose.connection;
+    cachedPromise = null;
 
     return cachedConnection;
   } catch (error) {
     console.log(error);
+
+    cachedPromise = null;
 
     throw error;
   }
